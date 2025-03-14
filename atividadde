@@ -1,0 +1,26 @@
+// server.js
+const express = require('express');
+const cors = require('cors');
+const app = express();
+const port = 5000;
+
+// Usando o middleware para permitir requisições entre diferentes origens
+app.use(cors());
+app.use(express.json()); // Para processar JSON no corpo das requisições
+
+// Rota para processar o resultado do quiz
+let results = []; // Para armazenar os resultados dos quizzes
+
+app.post('/submit-quiz', (req, res) => {
+  const { name, score } = req.body;
+
+  // Armazenar resultado
+  results.push({ name, score });
+
+  // Retornar uma resposta com o status
+  res.status(200).json({ message: "Resultado enviado com sucesso!", data: { name, score } });
+});
+
+app.listen(port, () => {
+  console.log(Servidor rodando na porta http://localhost:${port});
+});
