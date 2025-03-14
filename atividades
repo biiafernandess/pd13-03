@@ -1,0 +1,111 @@
+// src/App.js
+import React, { useState } from 'react';
+import './App.css';
+
+function App() {
+  // Perguntas do quiz
+  const questions = [
+    {
+      question: "Qual a capital do Brasil?",
+      options: ["Rio de Janeiro", "Brasília", "São Paulo", "Salvador"],
+      correctAnswer: "Brasília",
+    },
+    {
+      question: "Qual é o maior planeta do sistema solar?",
+      options: ["Terra", "Júpiter", "Marte", "Saturno"],
+      correctAnswer: "Júpiter",
+    },
+    {
+      question: "Quantos estados tem o Brasil?",
+      options: ["26", "27", "24", "28"],
+      correctAnswer: "26",
+    }
+  ];
+
+  // Estado para controlar as respostas do quiz
+  const [answers, setAnswers] = useState({});
+  const [score, setScore] = useState(0);
+  const [name, setName] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleAnswerChange = (questionIndex, answer) => {
+    setAnswers({
+      ...answers,
+      [questionIndex]: answer,
+    });
+  };
+
+  const handleSubmit = async () => {
+    let currentScore = 0;
+
+    // Calcular a pontuação
+    questions.forEach((q, index) => {
+      if (answers[index] === q.correctAnswer) {
+        currentScore++;
+      }
+    });
+
+    setScore(currentScore);
+    setSubmitted(true);
+
+    // Enviar os resultados para o backend
+    await fetch('http://localhost:5000/submit-quiz', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, score: currentScore }),
+    });
+  };
+
+  return (
+    <div className="App">
+      <h1>Quiz Interativo</h1>
+      
+      {!submitted ? (
+        <div>
+          <div>
+            <label>Digite seu nome:</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Seu nome"
+            />
+          </div>
+          
+          {questions.map((q, index) => (
+            <div key={index}>
+              <h2>{q.question}</h2>
+              {q.options.map((option, i) => (
+                <label key={i}>
+                  <input
+                    type="radio"
+                    name={question-${index}}
+                    value={option}
+                    onChange={() => handleAnswerChange(index, option)}
+                    checked={answers[index] === option}
+                  />
+                  {option}
+                </label>
+              ))}
+            </div>
+          ))}
+          
+          <button onClick={handleSubmit}>Enviar Respostas</button>
+        </div>
+      ) : (
+        <div>
+          <h2>Resultado</h2>
+          <p>Nome: {name}</p>
+          <p>Pontuação: {score}/{questions.length}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+
+
+
